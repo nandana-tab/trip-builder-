@@ -1,0 +1,8 @@
+{
+  "name": "TripBuilder",
+  "description": "A personalized trip-planning and itinerary application with curated recommendations, customizable day-by-day plans, and budget tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
