@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { POPULAR_DESTINATIONS, DestinationInfo } from '../../data/seedData';
 import { useTrip } from '../../context/TripContext';
+import { getDestinationDailyAvgUSD } from '../../utils/destinationCost';
 
 interface Step1Props {
   onNext: () => void;
@@ -18,32 +19,44 @@ export const Step1Destination: React.FC<Step1Props> = ({ onNext }) => {
   );
 
   const handleSelect = (dest: DestinationInfo) => {
+    const dailyAvg = getDestinationDailyAvgUSD(
+      dest.name,
+      dest.country,
+      wizardDraft.budget_tier || 'mid-range'
+    );
+    const totalUSD = dailyAvg * wizardDraft.duration_days * wizardDraft.travel_group.size;
     updateWizardDraft({
       destination: dest.name,
       destination_country: dest.country,
       destination_image: dest.image,
-      total_budget_usd: dest.avgDailyBudget * wizardDraft.duration_days * 2
+      total_budget_usd: Math.max(20, totalUSD)
     });
   };
 
   const handleApplyCustom = () => {
     if (!customCity.trim()) return;
+    const dailyAvg = getDestinationDailyAvgUSD(
+      customCity.trim(),
+      'Global',
+      wizardDraft.budget_tier || 'mid-range'
+    );
+    const totalUSD = dailyAvg * wizardDraft.duration_days * wizardDraft.travel_group.size;
     updateWizardDraft({
       destination: customCity.trim(),
       destination_country: 'Global',
       destination_image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80',
-      total_budget_usd: 200 * wizardDraft.duration_days * 2
+      total_budget_usd: Math.max(20, totalUSD)
     });
     setCustomCity('');
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center max-w-xl mx-auto mb-8">
-        <span className="text-xs uppercase font-bold tracking-widest text-[#a4362d]">
-          Step 1 of 6
+    <div className="space-y-6 pt-1 sm:pt-2">
+      <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
+        <span className="text-xs uppercase font-bold tracking-widest text-[#a4362d] inline-block mb-1">
+          Step 1 of 7
         </span>
-        <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#181c1d] mt-1">
+        <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#181c1d] leading-tight">
           Where do you wanna go?
         </h2>
         <p className="text-sm text-[#57423f] mt-2">

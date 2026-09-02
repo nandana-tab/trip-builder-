@@ -6,6 +6,7 @@ import {
   getBaseHotelForTrip,
   analyzeDayEaseForRecommendation
 } from '../utils/distanceUtils';
+import { formatCurrency } from '../utils/currency';
 
 interface RecommendationsViewProps {
   onNavigateToItinerary: () => void;
@@ -286,7 +287,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({ onNavi
                           {rec.name}
                         </h3>
                         <span className="text-xs font-bold text-[#a4362d] bg-[#ffdad5]/50 px-2 py-0.5 rounded">
-                          {rec.price_tier} • ${rec.estimated_cost_usd}
+                          {rec.price_tier} • {formatCurrency(rec.estimated_cost_usd, trip?.currency)}
                         </span>
                       </div>
 
@@ -326,6 +327,26 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({ onNavi
                         </span>
                         <span className="leading-snug">{rec.why_recommended}</span>
                       </div>
+
+                      {/* Dietary match indicator if active */}
+                      {rec.category === 'Restaurants' && trip?.food_preferences && !trip.food_preferences.is_skipped && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {trip.food_preferences.dietary?.map(d => {
+                            const combined = (rec.tags.join(' ') + ' ' + rec.description + ' ' + rec.name).toLowerCase();
+                            const match = (d === 'vegetarian' && /veg|plant|salad|noodle|soup|soba|cafe|bistro/i.test(combined)) ||
+                                          (d === 'vegan' && /vegan|plant|soba|salad|tofu/i.test(combined)) ||
+                                          (d === 'halal' && /halal|middle east|curry|indian|turkish|seafood/i.test(combined)) ||
+                                          (d === 'pescatarian' && /sushi|seafood|fish|oyster|raw bar|catch/i.test(combined));
+                            if (!match) return null;
+                            return (
+                              <span key={d} className="inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                                <span className="material-symbols-outlined text-xs">eco</span>
+                                <span className="capitalize">{d.replace('_', ' ')} Match</span>
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
 
                       {/* Tags */}
                       <div className="flex flex-wrap gap-1.5 mt-3">

@@ -60,40 +60,86 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f7fafb] flex flex-col justify-between relative overflow-hidden">
-      {/* Background Ambience */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#ffdad5]/40 rounded-full blur-3xl pointer-events-none -mr-48 -mt-48"></div>
-      <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-[#dec0bc]/30 rounded-full blur-3xl pointer-events-none -ml-48 -mb-48"></div>
+    <div className="min-h-screen relative flex flex-col justify-between overflow-hidden bg-[#181c1d] selection:bg-[#a4362d] selection:text-white">
+      {/* High-Resolution Travel & Cartography Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 scale-105"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=2400&q=85')`
+        }}
+      />
 
-      {/* Top Header */}
+      {/* Atmospheric Overlays & Vignette */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#181c1d]/75 via-[#181c1d]/60 to-[#181c1d]/90 backdrop-blur-[2px]" />
+      
+      {/* Decorative Radial Warm Ambient Glows */}
+      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[#a4362d]/25 rounded-full blur-3xl pointer-events-none -mt-48" />
+      <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-[#dec0bc]/15 rounded-full blur-3xl pointer-events-none -mb-48" />
+
+      {/* Subtle Topographic Grid & Coordinate Lines */}
+      <div 
+        className="absolute inset-0 opacity-[0.07] pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
+          backgroundSize: '32px 32px'
+        }}
+      />
+
+      {/* Floating Travel Location Badges (Visible on larger screens for depth) */}
+      <div className="hidden lg:flex absolute top-24 left-12 items-center space-x-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/15 text-white/90 text-xs shadow-lg animate-pulse">
+        <span className="material-symbols-outlined text-sm text-[#ffdad5]">explore</span>
+        <span className="font-mono tracking-wider text-[11px]">TOKYO • 35.6762° N, 139.6503° E</span>
+      </div>
+
+      <div className="hidden lg:flex absolute bottom-24 left-12 items-center space-x-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/15 text-white/90 text-xs shadow-lg">
+        <span className="material-symbols-outlined text-sm text-[#ffdad5]">near_me</span>
+        <span className="font-mono tracking-wider text-[11px]">AMALFI • 40.6340° N, 14.6027° E</span>
+      </div>
+
+      <div className="hidden lg:flex absolute top-28 right-12 items-center space-x-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/15 text-white/90 text-xs shadow-lg">
+        <span className="material-symbols-outlined text-sm text-[#ffdad5]">flight</span>
+        <span className="font-mono tracking-wider text-[11px]">PARIS • 48.8566° N, 2.3522° E</span>
+      </div>
+
+      <div className="hidden lg:flex absolute bottom-28 right-12 items-center space-x-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/15 text-white/90 text-xs shadow-lg">
+        <span className="material-symbols-outlined text-sm text-[#ffdad5]">pin_drop</span>
+        <span className="font-mono tracking-wider text-[11px]">KYOTO • 35.0116° N, 135.7681° E</span>
+      </div>
+
+      {/* Top Navigation Header */}
       <header className="py-6 px-6 sm:px-12 flex items-center justify-between z-10 relative">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-9 h-9 rounded-2xl bg-[#a4362d] flex items-center justify-center text-white shadow-sm">
-            <span className="material-symbols-outlined text-xl">travel_explore</span>
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-2xl bg-[#a4362d] flex items-center justify-center text-white shadow-lg shadow-[#a4362d]/40 border border-white/20">
+            <span className="material-symbols-outlined text-2xl">travel_explore</span>
           </div>
-          <span className="font-serif text-2xl font-bold tracking-tight text-[#181c1d]">
-            TripBuilder
-          </span>
+          <div>
+            <span className="font-serif text-2xl font-bold tracking-tight text-white drop-shadow-sm block leading-none">
+              TripBuilder
+            </span>
+            <span className="text-[10px] tracking-widest text-[#ffdad5]/80 uppercase font-medium mt-0.5 block">
+              Bespoke Journey Curation
+            </span>
+          </div>
         </div>
 
         {onSkipAsGuest && (
           <button
             id="google-signin-skip-btn"
             onClick={onSkipAsGuest}
-            className="text-xs font-semibold text-[#57423f] hover:text-[#a4362d] transition-colors flex items-center space-x-1"
+            className="text-xs font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 transition-all flex items-center space-x-1.5 shadow-md group"
           >
             <span>Explore as Guest</span>
-            <span className="material-symbols-outlined text-base">arrow_forward</span>
+            <span className="material-symbols-outlined text-base group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
           </button>
         )}
       </header>
 
       {/* Center Sign In Card */}
       <main className="max-w-md w-full mx-auto px-4 sm:px-6 my-auto z-10 relative py-6">
-        <div className="bg-white rounded-3xl p-7 sm:p-9 border border-[#dec0bc]/80 shadow-2xl space-y-5">
+        <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-7 sm:p-9 border border-white/60 shadow-2xl shadow-black/40 space-y-5">
           {/* Header */}
           <div className="text-center space-y-1.5">
-            <div className="w-12 h-12 rounded-2xl bg-[#ffdad5] text-[#a4362d] flex items-center justify-center mx-auto mb-2 shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-[#ffdad5] text-[#a4362d] flex items-center justify-center mx-auto mb-2 shadow-inner border border-[#a4362d]/10">
               <span className="material-symbols-outlined text-2xl">flight_takeoff</span>
             </div>
             <span className="text-[10px] uppercase font-bold tracking-widest text-[#a4362d]">
@@ -103,7 +149,7 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
               Sign in to begin
             </h1>
             <p className="text-xs text-[#57423f] leading-relaxed">
-              Curate bespoke travel itineraries and sync your saved journeys across devices.
+              Curate bespoke travel itineraries, discover hidden gems, and sync your saved journeys across devices.
             </p>
           </div>
 
@@ -112,23 +158,25 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
             <button
               type="button"
               onClick={() => { setActiveTab('google'); setError(''); }}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
                 activeTab === 'google'
-                  ? 'bg-white text-[#181c1d] shadow-xs'
+                  ? 'bg-white text-[#181c1d] shadow-sm font-bold'
                   : 'text-[#8b716e] hover:text-[#181c1d]'
               }`}
             >
+              <span className="material-symbols-outlined text-sm">account_circle</span>
               <span>Google Account</span>
             </button>
             <button
               type="button"
               onClick={() => { setActiveTab('email'); setError(''); }}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
                 activeTab === 'email'
-                  ? 'bg-white text-[#181c1d] shadow-xs'
+                  ? 'bg-white text-[#181c1d] shadow-sm font-bold'
                   : 'text-[#8b716e] hover:text-[#181c1d]'
               }`}
             >
+              <span className="material-symbols-outlined text-sm">mail</span>
               <span>Email & Password</span>
             </button>
           </div>
@@ -148,7 +196,7 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
                 type="button"
                 disabled={loading}
                 onClick={handleGoogleSignIn}
-                className="w-full py-3.5 px-5 rounded-2xl border-2 border-[#dec0bc] bg-white hover:bg-[#ffdad5]/20 hover:border-[#a4362d] text-sm font-bold text-[#181c1d] transition-all flex items-center justify-center space-x-3 shadow-sm hover:shadow active:scale-[0.99] disabled:opacity-60"
+                className="w-full py-3.5 px-5 rounded-2xl border-2 border-[#dec0bc] bg-white hover:bg-[#ffdad5]/20 hover:border-[#a4362d] text-sm font-bold text-[#181c1d] transition-all flex items-center justify-center space-x-3 shadow-sm hover:shadow active:scale-[0.99] disabled:opacity-60 cursor-pointer"
               >
                 {/* Official Google 'G' Icon */}
                 <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0">
@@ -172,12 +220,12 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
                   </svg>
                 </div>
                 <span>
-                  {loading ? 'Connecting with Google...' : 'Sign in with Google'}
+                  {loading ? 'Connecting with Google...' : 'Continue with Google'}
                 </span>
               </button>
 
               <p className="text-[11px] text-[#8b716e] text-center leading-relaxed">
-                Connect securely with one click using your Google account.
+                Instant secure sign-in with your Google account • No password required.
               </p>
             </div>
           ) : (
@@ -230,7 +278,7 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-[#a4362d] hover:bg-[#8b2d25] text-white font-semibold text-xs shadow-md transition-all flex items-center justify-center space-x-2 mt-2 disabled:opacity-60"
+                className="w-full py-3 rounded-xl bg-[#a4362d] hover:bg-[#8b2d25] text-white font-semibold text-xs shadow-md transition-all flex items-center justify-center space-x-2 mt-2 disabled:opacity-60 cursor-pointer"
               >
                 {loading ? (
                   <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
@@ -263,7 +311,7 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
             </div>
             <div className="flex items-center space-x-1.5">
               <span className="material-symbols-outlined text-sm text-[#a4362d]">share</span>
-              <span>Live Sharing</span>
+              <span>Live Trip Sharing</span>
             </div>
             <div className="flex items-center space-x-1.5">
               <span className="material-symbols-outlined text-sm text-[#a4362d]">tune</span>
@@ -278,7 +326,7 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
             <button
               id="google-signin-guest-btn"
               onClick={onSkipAsGuest}
-              className="text-xs text-[#8b716e] hover:text-[#181c1d] underline decoration-[#dec0bc] transition-colors"
+              className="text-xs text-white/80 hover:text-white underline decoration-white/40 hover:decoration-white transition-colors drop-shadow"
             >
               Continue without signing in (Guest mode)
             </button>
@@ -287,8 +335,8 @@ export const GoogleSignInPage: React.FC<GoogleSignInPageProps> = ({
       </main>
 
       {/* Footer info */}
-      <footer className="py-3 text-center text-[11px] text-[#8b716e] z-10 relative">
-        <span>Protected by Firebase Authentication • TripBuilder Travel Curation</span>
+      <footer className="py-4 text-center text-[11px] text-white/70 z-10 relative">
+        <span>Protected by Firebase Authentication • TripBuilder Curated Expeditions</span>
       </footer>
     </div>
   );

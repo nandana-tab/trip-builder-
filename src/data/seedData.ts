@@ -13,22 +13,22 @@ export interface DestinationInfo {
 
 export const POPULAR_DESTINATIONS: DestinationInfo[] = [
   {
-    name: 'Tokyo',
-    country: 'Japan',
-    tagline: 'Neon skylines, ancient shrines & Michelin-star culinary alleys',
-    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80',
-    bestSeason: 'Spring (Mar–May) & Autumn (Sep–Nov)',
-    avgDailyBudget: 220,
-    highlightTags: ['Culinary Haven', 'Tradition & Modernity', 'Safe & Fast Transit']
-  },
-  {
     name: 'India',
     country: 'India',
     tagline: 'Royal palaces of Rajasthan, fragrant spice bazaars & majestic heritage forts',
     image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80',
     bestSeason: 'October to March (Pleasant & Cool)',
-    avgDailyBudget: 130,
+    avgDailyBudget: 35,
     highlightTags: ['Royal Palaces', 'Heritage Forts', 'Rich Culinary Culture']
+  },
+  {
+    name: 'Paris',
+    country: 'France',
+    tagline: 'Haussmannian boulevards, world-class art collections & sidewalk bistros',
+    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80',
+    bestSeason: 'Spring & Autumn',
+    avgDailyBudget: 240,
+    highlightTags: ['Art & Architecture', 'Haute Gastronomy', 'Romantic Walks']
   },
   {
     name: 'United States',
@@ -36,17 +36,26 @@ export const POPULAR_DESTINATIONS: DestinationInfo[] = [
     tagline: 'Manhattan skylines, Broadway arts, iconic landmarks & world-class dining',
     image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1200&q=80',
     bestSeason: 'Spring (Apr–Jun) & Autumn (Sep–Nov)',
-    avgDailyBudget: 320,
+    avgDailyBudget: 280,
     highlightTags: ['World-Class Arts', 'Skyline Vistas', 'Diverse Gastronomy']
   },
   {
-    name: 'China',
-    country: 'China',
-    tagline: 'The Imperial Forbidden City, ancient Great Wall & dazzling futuristic skylines',
-    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
-    bestSeason: 'September to November & April to May',
-    avgDailyBudget: 170,
-    highlightTags: ['Imperial Heritage', 'Great Wall Wonders', 'Culinary Traditions']
+    name: 'Bali',
+    country: 'Indonesia',
+    tagline: 'Emerald rice terraces, spiritual water temples & coastal surf sunsets',
+    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80',
+    bestSeason: 'May to September (Dry Season)',
+    avgDailyBudget: 65,
+    highlightTags: ['Wellness & Yoga', 'Volcanic Landscapes', 'Tropical Villas']
+  },
+  {
+    name: 'Tokyo',
+    country: 'Japan',
+    tagline: 'Neon skylines, ancient shrines & Michelin-star culinary alleys',
+    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80',
+    bestSeason: 'Spring (Mar–May) & Autumn (Sep–Nov)',
+    avgDailyBudget: 160,
+    highlightTags: ['Culinary Haven', 'Tradition & Modernity', 'Safe & Fast Transit']
   },
   {
     name: 'United Kingdom',
@@ -54,8 +63,17 @@ export const POPULAR_DESTINATIONS: DestinationInfo[] = [
     tagline: 'Royal West End theatres, historic Thames landmarks & quintessential gardens',
     image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80',
     bestSeason: 'May to September',
-    avgDailyBudget: 260,
+    avgDailyBudget: 220,
     highlightTags: ['Royal Heritage', 'West End Arts', 'Iconic Pubs & Markets']
+  },
+  {
+    name: 'China',
+    country: 'China',
+    tagline: 'The Imperial Forbidden City, ancient Great Wall & dazzling futuristic skylines',
+    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
+    bestSeason: 'September to November & April to May',
+    avgDailyBudget: 80,
+    highlightTags: ['Imperial Heritage', 'Great Wall Wonders', 'Culinary Traditions']
   },
   {
     name: 'Kyoto',
@@ -63,7 +81,7 @@ export const POPULAR_DESTINATIONS: DestinationInfo[] = [
     tagline: 'Centuries of Zen gardens, bamboo groves & geisha districts',
     image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80',
     bestSeason: 'Spring & Autumn',
-    avgDailyBudget: 190,
+    avgDailyBudget: 140,
     highlightTags: ['Zen Temples', 'Tea Ceremonies', 'Historic Inns']
   },
   {
@@ -72,7 +90,7 @@ export const POPULAR_DESTINATIONS: DestinationInfo[] = [
     tagline: 'Cliffside lemon groves, azure Mediterranean waters & pastel villages',
     image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80',
     bestSeason: 'Late Spring (May–Jun) & Early Autumn (Sep–Oct)',
-    avgDailyBudget: 340,
+    avgDailyBudget: 320,
     highlightTags: ['Coastal Views', 'Fresh Seafood', 'Luxury Escapes']
   },
   {
@@ -81,26 +99,8 @@ export const POPULAR_DESTINATIONS: DestinationInfo[] = [
     tagline: 'Sun-drenched cobblestones, fado music & pastel-hued miradouros',
     image: 'https://images.unsplash.com/photo-1585208798174-6cedd86e019a?auto=format&fit=crop&w=1200&q=80',
     bestSeason: 'April to October',
-    avgDailyBudget: 160,
+    avgDailyBudget: 120,
     highlightTags: ['Vibrant Culture', 'Affordable Luxury', 'Pastéis de Nata']
-  },
-  {
-    name: 'Bali',
-    country: 'Indonesia',
-    tagline: 'Emerald rice terraces, spiritual water temples & coastal surf sunsets',
-    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80',
-    bestSeason: 'May to September (Dry Season)',
-    avgDailyBudget: 110,
-    highlightTags: ['Wellness & Yoga', 'Volcanic Landscapes', 'Tropical Villas']
-  },
-  {
-    name: 'Paris',
-    country: 'France',
-    tagline: 'Haussmannian boulevards, world-class art collections & sidewalk bistros',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80',
-    bestSeason: 'Spring & Autumn',
-    avgDailyBudget: 280,
-    highlightTags: ['Art & Architecture', 'Haute Gastronomy', 'Romantic Walks']
   },
   {
     name: 'Scottish Highlands',
@@ -108,7 +108,7 @@ export const POPULAR_DESTINATIONS: DestinationInfo[] = [
     tagline: 'Dramatic lochs, ancient castles, misty glens & single-malt distilleries',
     image: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&q=80',
     bestSeason: 'May to September',
-    avgDailyBudget: 210,
+    avgDailyBudget: 170,
     highlightTags: ['Wild Nature', 'Historic Castles', 'Scenic Road Trips']
   },
   {
@@ -117,7 +117,7 @@ export const POPULAR_DESTINATIONS: DestinationInfo[] = [
     tagline: 'Colosseum ruins, espresso bar culture & cinematic fountain piazzas',
     image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80',
     bestSeason: 'April to June & September to November',
-    avgDailyBudget: 240,
+    avgDailyBudget: 160,
     highlightTags: ['Living History', 'Trattoria Classics', 'Renaissance Art']
   }
 ];
@@ -2877,6 +2877,7 @@ export const SAMPLE_INITIAL_TRIP: Trip = {
   },
   budget_tier: 'premium',
   total_budget_usd: 3500,
+  currency: 'USD',
   travel_dna: ['culinary', 'culture_history', 'hidden_gems'],
   priority_tags: ['Local Cuisine & Fine Dining', 'Art, Architecture & History'],
   fine_tune: {

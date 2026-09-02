@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTrip } from '../../context/TripContext';
 import { TravelGroupType } from '../../types';
+import { getDestinationDailyAvgUSD } from '../../utils/destinationCost';
 
 export const Step3Group: React.FC = () => {
   const { wizardDraft, updateWizardDraft } = useTrip();
@@ -29,34 +30,51 @@ export const Step3Group: React.FC = () => {
       size = wizardDraft.travel_group.size >= 2 ? wizardDraft.travel_group.size : 3;
     }
 
+    const dailyAvg = getDestinationDailyAvgUSD(
+      wizardDraft.destination,
+      wizardDraft.destination_country,
+      wizardDraft.budget_tier || 'mid-range'
+    );
+    const newBudget = dailyAvg * wizardDraft.duration_days * size;
+
     updateWizardDraft({
       travel_group: {
         type,
         size,
         label: `${size} Traveler${size > 1 ? 's' : ''}`
-      }
+      },
+      total_budget_usd: Math.max(20, newBudget)
     });
   };
 
   const handleSizeChange = (newSize: number) => {
     if (isSolo || isCouple) return;
     if (newSize < 2 || newSize > 20) return;
+
+    const dailyAvg = getDestinationDailyAvgUSD(
+      wizardDraft.destination,
+      wizardDraft.destination_country,
+      wizardDraft.budget_tier || 'mid-range'
+    );
+    const newBudget = dailyAvg * wizardDraft.duration_days * newSize;
+
     updateWizardDraft({
       travel_group: {
         ...wizardDraft.travel_group,
         size: newSize,
         label: `${newSize} Traveler${newSize > 1 ? 's' : ''}`
-      }
+      },
+      total_budget_usd: Math.max(20, newBudget)
     });
   };
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
-      <div className="text-center mb-8">
-        <span className="text-xs uppercase font-bold tracking-widest text-[#a4362d]">
-          Step 3 of 6
+    <div className="space-y-8 max-w-2xl mx-auto pt-1 sm:pt-2">
+      <div className="text-center mb-6 sm:mb-8">
+        <span className="text-xs uppercase font-bold tracking-widest text-[#a4362d] inline-block mb-1">
+          Step 3 of 7
         </span>
-        <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#181c1d] mt-1">
+        <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#181c1d] leading-tight">
           Who's coming along?
         </h2>
         <p className="text-sm text-[#57423f] mt-2">

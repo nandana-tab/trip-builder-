@@ -23,6 +23,13 @@ export interface FineTunePreferences {
   pace: ItineraryPace;
 }
 
+export interface FoodPreferences {
+  dietary: string[];
+  cuisines: string[];
+  custom_notes?: string;
+  is_skipped?: boolean;
+}
+
 export interface Trip {
   id: string;
   user_id: string;
@@ -36,8 +43,10 @@ export interface Trip {
   travel_group: TravelGroup;
   budget_tier: BudgetTier;
   total_budget_usd: number;
+  currency?: string;
   travel_dna: string[];
   priority_tags: string[];
+  food_preferences?: FoodPreferences;
   fine_tune: FineTunePreferences;
   status: 'draft' | 'curating' | 'curated' | 'finalized' | 'completed';
   created_at: string;

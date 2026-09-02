@@ -8,6 +8,7 @@ import {
   analyzeDayEaseForRecommendation,
   TransitInfo
 } from '../utils/distanceUtils';
+import { formatCurrency, CURRENCIES, getCurrencyConfig, CurrencyCode } from '../utils/currency';
 
 interface ItineraryViewProps {
   onNavigateToSummary: () => void;
@@ -29,7 +30,8 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
     moveSelectedItem,
     calculateBudgetBreakdown,
     getAlternativeRecommendations,
-    recommendations
+    recommendations,
+    updateTrip
   } = useTrip();
 
   const trip = activeTripId ? getTripById(activeTripId) : null;
@@ -47,6 +49,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
       };
 
   const [activeDayFilter, setActiveDayFilter] = useState<number | 'all'>('all');
+  const [mobileFiscalExpanded, setMobileFiscalExpanded] = useState<boolean>(false);
   const [swappingItemId, setSwappingItemId] = useState<string | null>(null);
   const [swapCategoryFilter, setSwapCategoryFilter] = useState<string>('All');
   const [swapSearchQuery, setSwapSearchQuery] = useState<string>('');
@@ -203,6 +206,139 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left / Main Column: Days Tabs & Day-by-Day Schedule */}
           <div className="lg:col-span-8 space-y-6">
+            {/* Mobile-Friendly Fiscal Tracker Card (prominently visible on phones without scrolling to bottom) */}
+            <div
+              id="mobile-fiscal-tracker-card"
+              className="lg:hidden bg-white rounded-3xl p-5 border border-[#dec0bc]/80 shadow-sm space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-9 h-9 rounded-2xl bg-[#ffdad5]/60 flex items-center justify-center text-[#a4362d]">
+                    <span className="material-symbols-outlined text-xl">account_balance_wallet</span>
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-base font-bold text-[#181c1d]">Fiscal Tracker</h3>
+                    <p className="text-[11px] text-[#57423f]">
+                      Est. Spent: <strong className="text-[#181c1d]">{formatCurrency(budget.total_estimated, trip.currency)}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <span className="text-[10px] font-bold text-[#a4362d] bg-[#ffdad5]/50 px-2 py-0.5 rounded-full uppercase">
+                    {trip.currency || 'USD'}
+                  </span>
+                  <button
+                    id="toggle-mobile-fiscal-details-btn"
+                    type="button"
+                    onClick={() => setMobileFiscalExpanded(prev => !prev)}
+                    className="p-1.5 rounded-xl border border-[#dec0bc] text-[#57423f] hover:bg-[#ffdad5]/30 text-xs flex items-center"
+                    title={mobileFiscalExpanded ? 'Hide breakdown' : 'Show breakdown'}
+                  >
+                    <span className="material-symbols-outlined text-base">
+                      {mobileFiscalExpanded ? 'expand_less' : 'expand_more'}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="font-semibold text-[#181c1d]">
+                    {formatCurrency(budget.total_estimated, trip.currency)}{' '}
+                    <span className="text-[11px] font-normal text-[#8b716e]">/ {formatCurrency(budget.budget_goal, trip.currency)}</span>
+                  </span>
+                  <span className="font-bold text-[#a4362d]">{budgetPercent}%</span>
+                </div>
+                <div className="w-full bg-[#dec0bc]/30 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 rounded-full ${
+                      budgetPercent > 100 ? 'bg-[#ba1a1a]' : 'bg-[#a4362d]'
+                    }`}
+                    style={{ width: `${Math.min(100, budgetPercent)}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-[#8b716e]">{trip.budget_tier.toUpperCase()} TIER</span>
+                  <span className={budget.difference >= 0 ? 'text-emerald-700 font-semibold' : 'text-[#ba1a1a] font-semibold'}>
+                    {budget.difference >= 0
+                      ? `${formatCurrency(budget.difference, trip.currency)} remaining`
+                      : `${formatCurrency(Math.abs(budget.difference), trip.currency)} over budget`}
+                  </span>
+                </div>
+              </div>
+
+              {/* Expandable Category Breakdown on Mobile */}
+              {mobileFiscalExpanded && (
+                <div className="space-y-3 pt-3 border-t border-[#dec0bc]/40 text-xs animate-in fade-in duration-200">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2.5 rounded-2xl bg-[#f7fafb] border border-[#dec0bc]/40">
+                      <div className="flex items-center space-x-1 text-[10px] text-[#57423f] mb-0.5">
+                        <span className="material-symbols-outlined text-xs text-[#a4362d]">hotel</span>
+                        <span>Stays</span>
+                      </div>
+                      <p className="font-bold text-xs text-[#181c1d]">{formatCurrency(budget.accommodations, trip.currency)}</p>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-[#f7fafb] border border-[#dec0bc]/40">
+                      <div className="flex items-center space-x-1 text-[10px] text-[#57423f] mb-0.5">
+                        <span className="material-symbols-outlined text-xs text-[#a4362d]">restaurant</span>
+                        <span>Dining</span>
+                      </div>
+                      <p className="font-bold text-xs text-[#181c1d]">{formatCurrency(budget.dining, trip.currency)}</p>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-[#f7fafb] border border-[#dec0bc]/40">
+                      <div className="flex items-center space-x-1 text-[10px] text-[#57423f] mb-0.5">
+                        <span className="material-symbols-outlined text-xs text-[#a4362d]">explore</span>
+                        <span>Activities</span>
+                      </div>
+                      <p className="font-bold text-xs text-[#181c1d]">{formatCurrency(budget.activities, trip.currency)}</p>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-[#f7fafb] border border-[#dec0bc]/40">
+                      <div className="flex items-center space-x-1 text-[10px] text-[#57423f] mb-0.5">
+                        <span className="material-symbols-outlined text-xs text-[#a4362d]">directions_transit</span>
+                        <span>Transit</span>
+                      </div>
+                      <p className="font-bold text-xs text-[#181c1d]">{formatCurrency(budget.transport_other, trip.currency)}</p>
+                    </div>
+                  </div>
+
+                  {/* Currency Switcher Quick Bar for Mobile */}
+                  <div className="pt-2">
+                    <span className="text-[10px] uppercase font-bold text-[#8b716e] block mb-1.5">
+                      Switch Trip Currency:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(['USD', 'INR', 'EUR', 'GBP', 'JPY', 'AUD', 'AED', 'SGD', 'CAD'] as CurrencyCode[]).map(code => {
+                        const isCurr = (trip.currency || 'USD') === code;
+                        const config = getCurrencyConfig(code);
+                        return (
+                          <button
+                            key={code}
+                            type="button"
+                            onClick={() => {
+                              updateTrip(trip.id, { currency: code });
+                              showToast(`Currency changed to ${code} (${config.symbol})`);
+                            }}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                              isCurr
+                                ? 'bg-[#a4362d] text-white shadow-xs'
+                                : 'bg-[#f7fafb] text-[#57423f] hover:bg-[#ffdad5]/40 border border-[#dec0bc]/60'
+                            }`}
+                          >
+                            {config.symbol} {code}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Day Filter Pills */}
             <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
               <button
@@ -411,7 +547,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
 
                                       <div className="flex items-center space-x-2 self-end sm:self-center shrink-0">
                                         <span className="text-xs font-bold text-[#181c1d] mr-2">
-                                          ${item.recommendation.estimated_cost_usd}
+                                          {formatCurrency(item.recommendation.estimated_cost_usd, trip.currency)}
                                         </span>
 
                                         {/* Swap Button */}
@@ -524,26 +660,86 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                     ))}
                   </div>
                 </div>
+
+                {trip.food_preferences && (
+                  <div className="pt-2 border-t border-[#dec0bc]/40">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs text-[#8b716e] font-semibold flex items-center space-x-1">
+                        <span className="material-symbols-outlined text-xs text-[#a4362d]">restaurant</span>
+                        <span>Culinary Blueprint:</span>
+                      </span>
+                      {trip.food_preferences.is_skipped ? (
+                        <span className="text-[10px] font-semibold text-[#8b716e] bg-[#f7fafb] px-2 py-0.5 rounded border border-[#dec0bc]/40">
+                          Open to all
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {!trip.food_preferences.is_skipped ? (
+                      <div className="space-y-1.5">
+                        {trip.food_preferences.dietary && trip.food_preferences.dietary.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {trip.food_preferences.dietary.map(d => (
+                              <span
+                                key={d}
+                                className="text-[10px] font-semibold text-[#181c1d] bg-[#f7fafb] px-2 py-0.5 rounded-md border border-[#dec0bc]/60 capitalize"
+                              >
+                                {d.replace('_', ' ')}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {trip.food_preferences.custom_notes && (
+                          <p className="text-[11px] text-[#57423f] italic bg-[#ffdad5]/20 p-2 rounded-xl border border-[#dec0bc]/40">
+                            "{trip.food_preferences.custom_notes}"
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-[#8b716e]">
+                        Flexible dining without restriction
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Budget Tracker & Fiscal Balance */}
-            <div className="bg-white rounded-3xl p-6 border border-[#dec0bc]/80 shadow-sm space-y-5">
+            <div id="sidebar-fiscal-tracker" className="bg-white rounded-3xl p-6 border border-[#dec0bc]/80 shadow-sm space-y-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <span className="material-symbols-outlined text-[#a4362d] text-2xl">account_balance_wallet</span>
                   <h3 className="font-serif text-xl font-bold text-[#181c1d]">Fiscal Tracker</h3>
                 </div>
-                <span className="text-xs font-bold text-[#a4362d] bg-[#ffdad5]/50 px-2 py-0.5 rounded-full">
-                  {trip.budget_tier.toUpperCase()}
-                </span>
+                
+                {/* Currency selector dropdown */}
+                <div className="flex items-center space-x-1.5">
+                  <select
+                    id="sidebar-currency-select"
+                    value={trip.currency || 'USD'}
+                    onChange={(e) => {
+                      const newCode = e.target.value as CurrencyCode;
+                      const config = getCurrencyConfig(newCode);
+                      updateTrip(trip.id, { currency: newCode });
+                      showToast(`Currency changed to ${newCode} (${config.symbol})`);
+                    }}
+                    className="text-xs font-bold text-[#a4362d] bg-[#ffdad5]/50 border border-[#dec0bc] px-2.5 py-1 rounded-full outline-none cursor-pointer hover:bg-[#ffdad5]/70"
+                  >
+                    {CURRENCIES.map(curr => (
+                      <option key={curr.code} value={curr.code}>
+                        {curr.symbol} {curr.code}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {/* Progress Bar */}
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#57423f]">Est. Spent: <strong className="text-[#181c1d]">${budget.total_estimated.toLocaleString()}</strong></span>
-                  <span className="text-[#8b716e]">Goal: ${budget.budget_goal.toLocaleString()}</span>
+                  <span className="text-[#57423f]">Est. Spent: <strong className="text-[#181c1d]">{formatCurrency(budget.total_estimated, trip.currency)}</strong></span>
+                  <span className="text-[#8b716e]">Goal: {formatCurrency(budget.budget_goal, trip.currency)}</span>
                 </div>
                 <div className="w-full bg-[#dec0bc]/30 h-3 rounded-full overflow-hidden">
                   <div
@@ -557,8 +753,8 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                   <span>{budgetPercent}% allocated</span>
                   <span className={budget.difference >= 0 ? 'text-emerald-700 font-semibold' : 'text-[#ba1a1a] font-semibold'}>
                     {budget.difference >= 0
-                      ? `$${budget.difference.toLocaleString()} remaining`
-                      : `$${Math.abs(budget.difference).toLocaleString()} over budget`}
+                      ? `${formatCurrency(budget.difference, trip.currency)} remaining`
+                      : `${formatCurrency(Math.abs(budget.difference), trip.currency)} over budget`}
                   </span>
                 </div>
               </div>
@@ -570,7 +766,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                     <span className="material-symbols-outlined text-sm text-[#a4362d]">hotel</span>
                     <span>Accommodations</span>
                   </span>
-                  <span className="font-bold text-[#181c1d]">${budget.accommodations.toLocaleString()}</span>
+                  <span className="font-bold text-[#181c1d]">{formatCurrency(budget.accommodations, trip.currency)}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -578,7 +774,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                     <span className="material-symbols-outlined text-sm text-[#a4362d]">restaurant</span>
                     <span>Dining & Tastings</span>
                   </span>
-                  <span className="font-bold text-[#181c1d]">${budget.dining.toLocaleString()}</span>
+                  <span className="font-bold text-[#181c1d]">{formatCurrency(budget.dining, trip.currency)}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -586,7 +782,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                     <span className="material-symbols-outlined text-sm text-[#a4362d]">explore</span>
                     <span>Activities & Tours</span>
                   </span>
-                  <span className="font-bold text-[#181c1d]">${budget.activities.toLocaleString()}</span>
+                  <span className="font-bold text-[#181c1d]">{formatCurrency(budget.activities, trip.currency)}</span>
                 </div>
 
                 {budget.transport_other > 0 && (
@@ -595,7 +791,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                       <span className="material-symbols-outlined text-sm text-[#a4362d]">directions_transit</span>
                       <span>Transit & Other</span>
                     </span>
-                    <span className="font-bold text-[#181c1d]">${budget.transport_other.toLocaleString()}</span>
+                    <span className="font-bold text-[#181c1d]">{formatCurrency(budget.transport_other, trip.currency)}</span>
                   </div>
                 )}
               </div>
@@ -665,7 +861,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                 </div>
               </div>
               <span className="text-xs font-bold text-[#181c1d]">
-                ${swappingItem.recommendation.estimated_cost_usd}
+                {formatCurrency(swappingItem.recommendation.estimated_cost_usd, trip.currency)}
               </span>
             </div>
 
@@ -781,7 +977,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                       <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2 shrink-0">
                         <div className="text-left sm:text-right">
                           <span className="text-xs font-bold text-[#181c1d] block">
-                            ${alt.estimated_cost_usd}
+                            {formatCurrency(alt.estimated_cost_usd, trip.currency)}
                           </span>
                           <span
                             className={`text-[10px] font-semibold ${
@@ -793,9 +989,9 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({
                             }`}
                           >
                             {priceDiff > 0
-                              ? `+$${priceDiff}`
+                              ? `+${formatCurrency(priceDiff, trip.currency)}`
                               : priceDiff < 0
-                              ? `-$${Math.abs(priceDiff)}`
+                              ? `-${formatCurrency(Math.abs(priceDiff), trip.currency)}`
                               : 'Same cost'}
                           </span>
                         </div>

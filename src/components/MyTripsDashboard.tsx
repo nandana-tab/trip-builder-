@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTrip } from '../context/TripContext';
 import { useAuth } from '../context/AuthContext';
 import { POPULAR_DESTINATIONS } from '../data/seedData';
+import { formatCurrency } from '../utils/currency';
 
 interface MyTripsDashboardProps {
   onOpenTrip: (tripId: string) => void;
@@ -141,7 +142,7 @@ export const MyTripsDashboard: React.FC<MyTripsDashboardProps> = ({
                           <div className="flex justify-between text-[11px]">
                             <span className="text-[#8b716e]">Est. Cost:</span>
                             <span className="font-bold text-[#181c1d]">
-                              ${budget.total_estimated.toLocaleString()} / ${budget.budget_goal.toLocaleString()}
+                              {formatCurrency(budget.total_estimated, trip.currency)} / {formatCurrency(budget.budget_goal, trip.currency)}
                             </span>
                           </div>
                           <div className="w-full bg-[#dec0bc]/30 h-2 rounded-full overflow-hidden">

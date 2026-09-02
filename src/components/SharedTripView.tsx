@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTrip } from '../context/TripContext';
+import { formatCurrency } from '../utils/currency';
 
 interface SharedTripViewProps {
   tripId: string;
@@ -99,7 +100,7 @@ export const SharedTripView: React.FC<SharedTripViewProps> = ({ tripId, onPlanYo
             </div>
             <div className="p-3 bg-white rounded-2xl border border-[#dec0bc]/40">
               <span className="text-[10px] uppercase font-bold text-[#8b716e]">Est. Budget</span>
-              <p className="font-bold text-xs text-[#a4362d] mt-0.5">${budget.total_estimated.toLocaleString()}</p>
+              <p className="font-bold text-xs text-[#a4362d] mt-0.5">{formatCurrency(budget.total_estimated, trip.currency)}</p>
             </div>
           </div>
         </div>
@@ -138,7 +139,7 @@ export const SharedTripView: React.FC<SharedTripViewProps> = ({ tripId, onPlanYo
                         <div>
                           <div className="flex items-center justify-between text-[10px] font-bold text-[#a4362d] mb-1">
                             <span className="uppercase">{item.time_slot}</span>
-                            <span>${item.recommendation.estimated_cost_usd}</span>
+                            <span>{formatCurrency(item.recommendation.estimated_cost_usd, trip.currency)}</span>
                           </div>
                           <h4 className="font-serif text-sm font-bold text-[#181c1d]">
                             {item.recommendation.name}

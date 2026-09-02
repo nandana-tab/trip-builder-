@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTrip } from '../context/TripContext';
+import { formatCurrency } from '../utils/currency';
 
 interface TripSummaryViewProps {
   onBackToItinerary: () => void;
@@ -156,8 +157,8 @@ export const TripSummaryView: React.FC<TripSummaryViewProps> = ({
             <div className="text-right">
               <span className="text-xs text-[#8b716e] uppercase font-semibold">Total Estimated Cost</span>
               <p className="text-2xl font-serif font-bold text-[#a4362d]">
-                ${budget.total_estimated.toLocaleString()}{' '}
-                <span className="text-xs font-sans text-[#57423f]">/ ${budget.budget_goal.toLocaleString()}</span>
+                {formatCurrency(budget.total_estimated, trip.currency)}{' '}
+                <span className="text-xs font-sans text-[#57423f]">/ {formatCurrency(budget.budget_goal, trip.currency)}</span>
               </p>
             </div>
           </div>
@@ -169,7 +170,7 @@ export const TripSummaryView: React.FC<TripSummaryViewProps> = ({
                 <span className="font-semibold">Accommodations</span>
               </div>
               <p className="font-serif text-xl font-bold text-[#181c1d]">
-                ${budget.accommodations.toLocaleString()}
+                {formatCurrency(budget.accommodations, trip.currency)}
               </p>
             </div>
 
@@ -179,7 +180,7 @@ export const TripSummaryView: React.FC<TripSummaryViewProps> = ({
                 <span className="font-semibold">Dining & Tastings</span>
               </div>
               <p className="font-serif text-xl font-bold text-[#181c1d]">
-                ${budget.dining.toLocaleString()}
+                {formatCurrency(budget.dining, trip.currency)}
               </p>
             </div>
 
@@ -189,7 +190,7 @@ export const TripSummaryView: React.FC<TripSummaryViewProps> = ({
                 <span className="font-semibold">Activities & Passes</span>
               </div>
               <p className="font-serif text-xl font-bold text-[#181c1d]">
-                ${budget.activities.toLocaleString()}
+                {formatCurrency(budget.activities, trip.currency)}
               </p>
             </div>
           </div>
@@ -238,7 +239,7 @@ export const TripSummaryView: React.FC<TripSummaryViewProps> = ({
                           <div>
                             <div className="flex items-center justify-between text-[10px] font-bold text-[#a4362d] mb-1">
                               <span className="uppercase">{item.time_slot}</span>
-                              <span>${item.recommendation.estimated_cost_usd}</span>
+                              <span>{formatCurrency(item.recommendation.estimated_cost_usd, trip.currency)}</span>
                             </div>
                             <h4 className="font-serif text-sm font-bold text-[#181c1d]">
                               {item.recommendation.name}

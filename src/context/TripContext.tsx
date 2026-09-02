@@ -6,6 +6,7 @@ import {
   BudgetBreakdown,
   TimeSlot,
   FineTunePreferences,
+  FoodPreferences,
   TravelGroup
 } from '../types';
 import {
@@ -26,6 +27,7 @@ import {
   deleteDoc, 
   onSnapshot 
 } from 'firebase/firestore';
+import { getDestinationCostProfile } from '../utils/destinationCost';
 
 export interface WizardDraft {
   destination: string;
@@ -37,8 +39,10 @@ export interface WizardDraft {
   travel_group: TravelGroup;
   budget_tier: 'budget' | 'mid-range' | 'premium' | 'luxury';
   total_budget_usd: number;
+  currency?: string;
   travel_dna: string[];
   priority_tags: string[];
+  food_preferences?: FoodPreferences;
   fine_tune: FineTunePreferences;
 }
 
@@ -76,8 +80,15 @@ const DEFAULT_WIZARD_DRAFT: WizardDraft = {
   travel_group: { type: 'Couple', size: 2, label: '2 Travelers' },
   budget_tier: 'premium',
   total_budget_usd: 3500,
+  currency: 'USD',
   travel_dna: ['culinary', 'culture_history'],
   priority_tags: ['Local Cuisine & Fine Dining', 'Art, Architecture & History'],
+  food_preferences: {
+    dietary: ['non_veg'],
+    cuisines: ['local_authentic', 'cafes_bakeries'],
+    custom_notes: '',
+    is_skipped: false
+  },
   fine_tune: {
     accommodations: 4,
     dining: 5,
@@ -343,8 +354,10 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
       travel_group: wizardDraft.travel_group,
       budget_tier: wizardDraft.budget_tier,
       total_budget_usd: wizardDraft.total_budget_usd,
+      currency: wizardDraft.currency || 'USD',
       travel_dna: wizardDraft.travel_dna,
       priority_tags: wizardDraft.priority_tags,
+      food_preferences: wizardDraft.food_preferences,
       fine_tune: wizardDraft.fine_tune,
       status: 'curated',
       created_at: new Date().toISOString(),
@@ -361,6 +374,14 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const isDiningBudget = wizardDraft.budget_tier === 'budget' || wizardDraft.fine_tune.dining <= 2;
     const isDiningMid = wizardDraft.budget_tier === 'mid-range' || wizardDraft.fine_tune.dining === 3;
     const isDiningLuxury = wizardDraft.budget_tier === 'luxury' || wizardDraft.fine_tune.dining === 5;
+
+    const foodPrefs = wizardDraft.food_preferences;
+    const dietaryList = foodPrefs?.dietary || [];
+    const cuisinesList = foodPrefs?.cuisines || [];
+    const isVeg = dietaryList.includes('vegetarian') || dietaryList.includes('jain');
+    const isVegan = dietaryList.includes('vegan');
+    const isHalal = dietaryList.includes('halal');
+    const isPescatarian = dietaryList.includes('pescatarian');
 
     // Filter and score candidate hotels
     const hotelCandidates = availableRecs
@@ -417,6 +438,41 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
             else if (r.price_tier === '$$') s += 45;
             else s -= 20;
           }
+
+          // Boost based on food preferences if not skipped
+          if (!foodPrefs?.is_skipped) {
+            if (isVeg || isVegan) {
+              const isVegFriendly = r.tags.some(t => /veg|plant|garden|salad|tea|cafe|herb/i.test(t)) ||
+                /vegetarian|vegan|plant|soba|tofu|veggie|market|cafe/i.test(r.description);
+              if (isVegFriendly) s += 150;
+            }
+            if (isHalal) {
+              const isHalalFriendly = r.tags.some(t => /halal|middle east|curry|indian|turkish|seafood/i.test(t)) ||
+                /halal|pork-free|lamb|biryani|falafel|seafood/i.test(r.description);
+              if (isHalalFriendly) s += 120;
+            }
+            if (isPescatarian || cuisinesList.includes('seafood_fresh')) {
+              const isSeafood = r.tags.some(t => /sushi|seafood|fish|oyster|catch/i.test(t)) ||
+                /sushi|seafood|fish|tuna|clam|oyster|raw bar/i.test(r.description);
+              if (isSeafood) s += 130;
+            }
+            if (cuisinesList.includes('street_food')) {
+              const isStreet = r.tags.some(t => /street|market|bazaar|stall|alley/i.test(t)) ||
+                /street food|night market|alleyway|stall|vendor/i.test(r.description);
+              if (isStreet) s += 120;
+            }
+            if (cuisinesList.includes('fine_dining')) {
+              const isFine = r.tags.some(t => /michelin|omakase|chef|tasting/i.test(t)) ||
+                /michelin|tasting menu|omakase|chef/i.test(r.description);
+              if (isFine) s += 140;
+            }
+            if (cuisinesList.includes('cafes_bakeries')) {
+              const isCafe = r.tags.some(t => /cafe|bakery|coffee|brunch/i.test(t)) ||
+                /cafe|bakery|pour-over|coffee|pastry|matcha/i.test(r.description);
+              if (isCafe) s += 110;
+            }
+          }
+
           return s;
         };
         return score(b) - score(a);
@@ -685,9 +741,11 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    // If no hotel item selected, calculate standard per-night accommodation estimate based on tier & duration
+    // If no hotel item selected, calculate destination-specific per-night accommodation estimate based on tier & duration
     if (accommodations === 0 && trip) {
-      const perNight = trip.budget_tier === 'luxury' ? 650 : trip.budget_tier === 'premium' ? 320 : trip.budget_tier === 'mid-range' ? 170 : 85;
+      const destProfile = getDestinationCostProfile(trip.destination, trip.destination_country);
+      const tier = trip.budget_tier || 'mid-range';
+      const perNight = destProfile.accommodationPerNightUSD[tier] || 45;
       accommodations = perNight * Math.max(1, trip.duration_days - 1);
     }
 
